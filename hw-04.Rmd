@@ -1,0 +1,172 @@
+---
+title: "HW 04 - What should I major in?"
+author: "Andrew Kotarski"
+date: "03/21/2022"
+output: github_document
+---
+
+## Load packages and data
+
+```{r load-packages, message = FALSE}
+library(tidyverse)
+library(scales)
+library(fivethirtyeight)
+glimpse(college_recent_grads)
+```
+
+## Exercises
+
+### Exercise 1
+```{r ex 1}
+
+college_recent_grads %>% 
+  mutate(total = women + men)%>% 
+  mutate(porpotion = women/total)%>% 
+  arrange(desc(porpotion))  %>%
+  select(women, major, total) %>%
+  top_n(3)
+```
+
+
+Remove this text, and add your answer for Exercise 1 here.
+Add code chunks as needed.
+Don't forget to label your code chunk.
+Do not use spaces in code chunk labels.
+
+### Exercise 2
+
+We choose the median instead of the mean to display income because the median is not affected by high or low outliers. 
+
+### Exercise 3
+```{r ex3}
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 5000)
+```
+
+Binwidth is the better choice. The binwidth arguement controls the size of each bin on the x axis. The more the bin the wider each interval becomes. The 5000 binwidth is better visually as well as having a more clear x and y axis
+
+### Exercise 4
+
+...
+```{r ex4}
+college_recent_grads %>%
+  summarise(min = min(median), max = max(median),
+            mean = mean(median), med = median(median),
+            sd = sd(median), 
+            q1 = quantile(median, probs = 0.25),
+            q3 = quantile(median, probs = 0.75))
+```
+The summary stats that would be the must useful in describing the distrobution of the histogram would be Q1 and Q3 as well as the median and SD. 
+### Exercise 5
+
+```{r ex 5}
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 5000)+ 
+  facet_wrap(~major_category )
+```
+
+### Exercise 6
+```{r ex 6}
+college_recent_grads %>%
+  group_by(major_category) %>%
+summarise(median_income = median(median)) %>%
+ arrange(desc(median_income))
+  
+```
+
+...
+
+### Exercise 7
+```{r} 
+college_recent_grads %>%
+  count(major_category)%>%
+  arrange(n)
+
+```
+
+...
+
+### Exercise 8
+
+...
+```{r}
+college_recent_grads %>%
+  count(major_category)
+  
+```
+```{r}
+stem_categories <- c("Biology & Life Science",
+                     "Computers & Mathematics",
+                     "Engineering",
+                     "Physical Sciences")
+
+```
+Which STEM majors have median salaries equal to or less than the median for all majors’ median earnings? Your output should only show the major name and median, 25th percentile, and 75th percentile earning for that major as and should be sorted such that the major with the highest median earning is on top.
+```{r}
+college_recent_grads <- college_recent_grads %>%
+  mutate(major_type = ifelse(major_category %in% stem_categories, "stem", "not stem"))
+```
+
+```{r}
+college_recent_grads %>%
+  rename(
+    religion = `Religious tradition`,
+    n = `Sample Size`
+  ) %>%
+```
+
+
+
+```{r}
+college_recent_grads %>%
+  
+  filter(
+    major_type == "stem",
+    median <= 36000
+  ) 
+
+```
+
+```{r}
+college_recent_grads %>%
+  
+  filter(
+    major_type == "stem",
+    median <= 36000
+  )%>%
+  select(major, median, p25th, p75th )%>%
+  arrange(desc(median))
+
+```
+
+### Exercise 9
+Create a scatterplot of median income vs. proportion of women in that major, colored by whether the major is in a STEM field or not. Describe the association between these three variables.
+...
+Create a scatterplot of median income vs. proportion of women in that major, colored by whether the major is in a STEM field or not. Describe the association between these three variables.
+```{r}
+college_recent_grads %>% 
+  mutate(total = women + men)%>% 
+  mutate(porpotion = women/total)%>%
+  ggplot( aes( x = median, y = porpotion, color = major_type ))+
+  geom_point()
+
+```
+ Describe the association between these three variables: 
+ 
+ There is a higher portion of woman not in stem that made a lower median salary. There was a lower portion of woman in stem making around the same as those not in stem. As median wage increases the portion of those making that dwindle. 
+### Exercise 10
+
+How to find the line of best fit in this graph? 
+
+ 
+```{r}
+college_recent_grads %>% 
+  mutate(total = women + men)%>% 
+  mutate(porpotion = women/total)%>%
+  ggplot( aes( x = median, y = porpotion, color = major_type ))+
+  geom_point()+ 
+   geom_smooth(method=lm, se=FALSE)
+
+```
+ 
+ 
